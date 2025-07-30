@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>COVID Data Dashboard</title>
+</head>
+<body>
+    <h1>COVID-19 Latest Data</h1>
+    <table border="1">
+        <tr>
+            <th>Country</th>
+            <th>Total Cases</th>
+            <th>Total Deaths</th>
+            <th>Population</th>
+        </tr>
+        {% for row in data %}
+        <tr>
+            <td>{{ row.location }}</td>
+            <td>{{ row.total_cases }}</td>
+            <td>{{ row.total_deaths }}</td>
+            <td>{{ row.population }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

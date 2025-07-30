@@ -1,6 +1,6 @@
 > COVID-19 Data Analysis Web App
 >
-> This Django-based web application leverages **Pandas** for data processing and visualization of up-to-date COVID-19 statistics sourced from the [Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE)](https://github.com/CSSEGISandData/COVID-19) and related repositories.
+> This Django-based web application leverages **Pandas** for data processing and visualization of up-to-date COVID-19 statistics sourced from the [Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE)](https://github.com/CSSEGISandData/COVID-19) and related repositories
 >
 > Features
 >
@@ -30,11 +30,11 @@
 > 3.  Install Dependencies
 >     pip install -r requirements.txt
 >
-> > Make sure you have Python 3.8+ installed.
+> > Make sure you have Python 3.8+ installed
 >
 > 4.  Run the Development Server
 >     python manage.py runserver
->     Visit `http://127.0.0.1:8000/` in your browser.
+>     Visit `http://127.0.0.1:8000/` in your browser
 >
 > Example Output
 >
@@ -49,10 +49,10 @@
 >
 > Contributing
 >
-> We welcome community contributions! Here's how you can help:
+> We welcome community contributions! Here's how you can help
 >
 > 1.  Fork the repository
-> 2.  Create a new branch:
+> 2.  Create a new branch
 >
 > git checkout -b feature/your-feature-name
 >
@@ -74,8 +74,8 @@
 >
 > Contact
 >
-> Maintainer: \[Dereje Keneni]
-> Email: [keneni2022@gmail.com](mailto:your)
+> Maintainer: [Dereje Keneni]
+> Email: keneni2022@gmail.com
 > GitHub: [@Keneni-Tech](https://github.com/Keneni-Tech)
 >
 > _If you find this useful or interesting, feel free to ⭐ the repo and share it!_

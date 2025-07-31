@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}COVID-19 Chart{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4">COVID-19 Daily New Cases: {{ selected_country }}</h2>
+
+    <form method="get" class="mb-4">
+        <label for="country" class="form-label">Select Country:</label>
+        <select name="country" id="country" class="form-select w-50 d-inline-block" onchange="this.form.submit()">
+            {% for country in countries %}
+                <option value="{{ country }}" {% if country == selected_country %}selected{% endif %}>
+                    {{ country }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <canvas id="covidChart" width="800" height="400"></canvas>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('covidChart').getContext('2d');
+        const covidChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: JSON.parse('{{ dates|safe|escapejs }}'),
+                datasets: [{
+                    label: 'Daily New Cases in {{ selected_country }}',
+                    data: JSON.parse('{{ confirmed|safe|escapejs }}'),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'COVID-19 Daily New Cases Over Time'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        },
+                        ticks: {
+                            maxRotation: 90,
+                            minRotation: 45
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Number of Cases'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

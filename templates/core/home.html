@@ -1,8 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>COVID Data Dashboard</title>
-</head>
+{% extends "base.html" %}
+
+{% block title %}COVID Chart{% endblock %}
+
+{% block content %}
 <body>
     <h1>COVID-19 Latest Data</h1>
     <table border="1">
@@ -22,4 +22,6 @@
         {% endfor %}
     </table>
 </body>
-</html>
+
+{% endblock content %}
+

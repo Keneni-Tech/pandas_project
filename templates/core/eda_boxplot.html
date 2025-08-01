@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h2>Boxplot of Total Cases and Deaths</h2>
+    <img src="data:image/png;base64,{{ plot_url }}" class="img-fluid"/>
+</div>
+{% endblock %}

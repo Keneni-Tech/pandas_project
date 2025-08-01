@@ -3,6 +3,16 @@ import json
 from django.shortcuts import render
 from django.http import HttpResponseBadRequest
 
+import io
+import base64
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import plotly.express as px
+from django.utils.safestring import mark_safe
+import plotly.graph_objects as go
+
+
 ##########
 def index_view(request):
     url = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/latest/owid-covid-latest.csv"
@@ -103,3 +113,139 @@ def search_view(request):
     }
 
     return render(request, 'core/search.html', context)
+
+## eda_box_view
+## second test 
+
+def eda_boxplot_view(request):
+    url = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/latest/owid-covid-latest.csv"
+    df = pd.read_csv(url)
+
+    # Select only needed columns and drop missing values
+    df = df[["location", "total_cases", "total_deaths"]].dropna()
+
+    # Melt the DataFrame to long-form for Plotly Express
+    df_melted = df.melt(id_vars="location", value_vars=["total_cases", "total_deaths"],
+                        var_name="Metric", value_name="Value")
+
+    fig = px.box(df_melted, x="Metric", y="Value", points="all", title="Total Cases and Deaths (Boxplot)")
+    fig.update_layout(margin=dict(t=40, b=20))
+
+    plot_div = fig.to_html(full_html=False)
+
+    return render(request, 'core/boxplot.html', {'plot_div': mark_safe(plot_div)})
+
+def eda_scatterplot_view(request):
+    url = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/latest/owid-covid-latest.csv"
+    df = pd.read_csv(url)
+
+    df = df[["location", "total_cases", "population"]].dropna()
+
+    fig = px.scatter(
+        df, x="population", y="total_cases", hover_name="location",
+        title="Scatter Plot: Population vs Total Cases",
+        log_x=True, log_y=True,
+        labels={"population": "Population", "total_cases": "Total Cases"},
+    )
+    fig.update_traces(marker=dict(size=8, color='blue', opacity=0.6))
+    fig.update_layout(margin=dict(t=40, b=20))
+
+    plot_div = fig.to_html(full_html=False)
+
+    return render(request, 'core/scatterplot.html', {'plot_div': mark_safe(plot_div)})
+
+
+
+## first draft
+
+def eda_boxplot_view22(request):
+    # Load COVID data
+    url = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/latest/owid-covid-latest.csv"
+    df = pd.read_csv(url)
+
+    # Filter relevant numeric columns
+    df = df[["location", "total_cases", "total_deaths", "population"]].dropna()
+
+    # Create box plot
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(data=df[["total_cases", "total_deaths"]])
+    plt.title("Boxplot of Total Cases and Deaths")
+
+    # Convert to base64 string
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+    plot_url = base64.b64encode(image_png).decode('utf-8')
+
+    context = {'plot_url': plot_url}
+
+    return render(request, 'core/eda_boxplot.html', context)
+
+
+def eda_scatterplot_view22(request):
+    # Load data
+    url = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/latest/owid-covid-latest.csv"
+    df = pd.read_csv(url)
+    df = df[["location", "total_cases", "total_deaths", "population"]].dropna()
+
+    # Create scatter plot: population vs total_cases
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(data=df, x='population', y='total_cases', hue='location', legend=False)
+    plt.xscale('log')  # Log scale for better visibility
+    plt.yscale('log')
+    plt.title("Scatter Plot: Population vs Total Cases")
+
+    # Convert to base64 string
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_png = buffer.getvalue()
+    buffer.close()
+    plot_url = base64.b64encode(image_png).decode('utf-8')
+
+    context = {'plot_url': plot_url}
+
+    return render(request, 'core/eda_scatterplot.html', context)
+
+
+######################
+
+def country_comparison_view(request):
+    url = "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/latest/owid-covid-latest.csv"
+    df = pd.read_csv(url)
+
+    # Filter only countries
+    df = df[df["iso_code"].str.startswith("OWID") == False]
+    df = df[["location", "total_cases", "total_deaths"]].dropna()
+
+    # Country selection from GET request
+    all_countries = sorted(df["location"].unique())
+    selected = request.GET.getlist("countries")
+
+    if selected:
+        df = df[df["location"].isin(selected)]
+
+    # Build bar chart
+    fig = go.Figure(data=[
+        go.Bar(name='Total Cases', x=df["location"], y=df["total_cases"], marker_color='blue'),
+        go.Bar(name='Total Deaths', x=df["location"], y=df["total_deaths"], marker_color='crimson'),
+    ])
+    fig.update_layout(
+        barmode='group',
+        title="COVID-19 Total Cases and Deaths by Country",
+        xaxis_title="Country",
+        yaxis_title="Count",
+        margin=dict(t=40, b=50),
+    )
+
+    plot_div = fig.to_html(full_html=False)
+
+    context = {
+        "countries": all_countries,
+        "selected": selected,
+        "plot_div": mark_safe(plot_div),
+    }
+
+    return render(request, "core/compare.html", context)
